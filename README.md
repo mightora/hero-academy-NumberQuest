@@ -23,7 +23,7 @@ Generated questions exclude recent equations. The finite question bank eventuall
 
 ## Saves and rewards
 
-Up to 12 named local players have independent scores, progress, outfits, settings, recent questions and practice records. Saves use localStorage. Existing v2 saves and imported v2 backups automatically migrate completion/record IDs to the expanded maps without changing points, names, outfits or treasures. Earlier v1 saves also migrate. Backups now export v3. No cloud sync or accounts.
+Up to 12 named local players have independent scores, progress, outfits, settings, recent questions and practice records. Saves use localStorage. Existing v2 saves and imported v2 backups automatically migrate completion/record IDs to the expanded maps without changing points, names, outfits or treasures. Earlier v1 saves also migrate. Backups now export v3. Local play needs no account; optional ChoreQuest connections provide per-hero cloud saves.
 
 Correct answer: 10 points. First restoration: 50. Mini-game finish: 25. First treasure: 15. Help does not reduce points; retries do not remove points. Replays earn answer and mini-game points. Independent and supported attempts remain distinguishable in Grown-ups.
 
@@ -40,3 +40,11 @@ Run `node --check app.js` and `node tests/progression.test.cjs`.
 Checks cover 10,800 generated questions across all operations, challenges and difficulty settings; missing-number answers; carrying/borrowing; all 240 map-stop render paths; and migration of existing points and completions. Browser layout and physical iPhone checks for this expansion remain outstanding.
 
 Original Hero Academy hero, Pip, terrain, landmarks and icon adapted from the user's mightora/hero-academy-reading repository. No open-source licence was selected for those assets. No runtime analytics, ads or third-party script dependencies.
+
+## ChoreQuest QR launch and saved adventures
+
+After a parent allows NumberQuest on the ChoreQuest game page, a signed-in hero can choose **Play NumberQuest** or display a one-time QR code. NumberQuest opens the matching local hero, restores their cloud save and syncs subsequent progress automatically. QR URLs carry only a short-lived exchange code in the fragment, which is removed immediately. Game-only tokens stay outside normal backups.
+
+Cloud saves include the NumberQuest score, completed stops, treasures, appearance, settings and up to 10,000 practice records. Saves and XP events survive offline retries, and duplicate requests cannot add a score increment twice. Completed stops and practice records merge across devices. Existing local scores are saved as game scores; only newly earned linked points add Hero XP. Chore money and redeemable points are separate. An unlinked player continues to use browser storage.
+
+This client requires ChoreQuest migration `0013_game_launch_and_saves.sql` and the matching API release before deployment. Apply the backend update first. Use `node --test tests/*.test.cjs` for client save/sync and maths regression checks. Physical iPhone and browser layout verification remain outstanding for this release.
