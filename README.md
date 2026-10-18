@@ -23,7 +23,7 @@ Generated questions exclude recent equations. The finite question bank eventuall
 
 ## Saves and rewards
 
-Up to 12 named local players have independent scores, progress, outfits, settings, recent questions and practice records. Saves use localStorage. Existing v2 saves and imported v2 backups automatically migrate completion/record IDs to the expanded maps without changing points, names, outfits or treasures. Earlier v1 saves also migrate. Backups now export v3. No cloud sync or accounts.
+Up to 12 named local players have independent scores, progress, outfits, settings, recent questions and practice records. Saves use localStorage. Existing v2 saves and imported v2 backups automatically migrate completion/record IDs to the expanded maps without changing points, names, outfits or treasures. Earlier v1 saves also migrate. Backups now export v3. Optional ChoreQuest central accounts add cloud profile saves and Hero XP synchronisation; the game also works without an account.
 
 Correct answer: 10 points. First restoration: 50. Mini-game finish: 25. First treasure: 15. Help does not reduce points; retries do not remove points. Replays earn answer and mini-game points. Independent and supported attempts remain distinguishable in Grown-ups.
 
@@ -40,3 +40,4 @@ Run `node --check app.js` and `node tests/progression.test.cjs`.
 Checks cover 10,800 generated questions across all operations, challenges and difficulty settings; missing-number answers; carrying/borrowing; all 240 map-stop render paths; and migration of existing points and completions. Browser layout and physical iPhone checks for this expansion remain outstanding.
 
 Original Hero Academy hero, Pip, terrain, landmarks and icon adapted from the user's mightora/hero-academy-reading repository. No open-source licence was selected for those assets. No runtime analytics, ads or third-party script dependencies.
+

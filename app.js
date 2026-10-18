@@ -1,4 +1,6 @@
 import {createChoreLink} from './chorequest-link.js';
+import {bootAcademy} from './academy-client.js';
+let academyAccount;
 import {hero,robot,icon} from './art.js';
 import {terrain,landmark} from './adventure.js';
 const KEY='hero-academy-numberquest-v3',PREVIOUS_KEY='hero-academy-numberquest-v2',OLD_KEY='hero-academy-numberquest-v1',colours=['#EC7540','#13786E','#586CCA','#AD4B7F'];
@@ -15,7 +17,7 @@ function connectChore(){const c=choreLink.status();open(head('Connect ChoreQuest
 const islands=['Addition village','Subtraction woods','Multiplication gardens','Division summit'],ops=['+','−','×','÷'],names=['Power the gate','Star catcher','Fix the bridge','Robot trail','Rescue a friend','Memory garden','Wake the beacon','Sky glider'],kinds=['base','workshop','bridge','garden','robot','garden','tower','tower'],positions=[[150,540],[310,540],[470,520],[700,520],[830,390],[670,310],[430,230],[200,170]],treasures=[[100,340],[900,570],[830,110]];
 const unlocked=n=>Number.isInteger(n)&&n>=0&&n<240,stars=()=>state.done.length*3,esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function hud(){let h=document.querySelector('#player-hud');if(!h){h=document.createElement('div');h.id='player-hud';document.querySelector('header').append(h);}h.innerHTML=`<button id="players">✦ ${esc(state.name)} ▾</button><strong id="points" aria-live="polite">★ ${state.points} points</strong>`;h.querySelector('button').onclick=profiles;const score=dialog.querySelector('#live-points');if(score)score.textContent=`★ ${state.points} points`;}
-function award(n,kind='answer',level=run?.level||0){state.points+=n;save();hud();choreLink.enqueue(kind,level);}
+function award(n,kind='answer',level=run?.level||0){state.points+=n;save();hud();if(academyAccount?.isConnected())academyAccount.event(kind,level);else choreLink.enqueue(kind,level);}
 function toast(t){document.querySelector('#status').textContent=t;clearTimeout(toast.t);toast.t=setTimeout(()=>document.querySelector('#status').textContent='',5000)}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(book));storage=true;}catch{storage=false;toast('Progress cannot save here. Ask a grown-up to export a backup.');}}
 function render(){hud();document.body.classList.toggle('reduce',state.reduce);document.documentElement.style.fontSize=16*state.scale+'px';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});app.innerHTML=view==='map'?map():view==='hero'?wardrobe():adult();bind();}
@@ -52,4 +54,15 @@ function frame(t){const dt=Math.min((t-last)/1000||0,.04);last=t;if(!paused){if(
 syncTrack();ctx.fillStyle='#d9eee1';ctx.fillRect(0,0,600,360);ctx.fillStyle='#91bdc7';ctx.fillRect(0,330,600,30);ctx.fillStyle='#b0cbaa';for(let i=0;i<6;i++){ctx.beginPath();ctx.arc(i*130,365,75,Math.PI,0);ctx.fill();}for(const item of items){if(glide){ctx.fillStyle='#126b62';ctx.fillRect(item.x,0,24,item.y-64);ctx.fillRect(item.x,item.y+64,24,360-item.y-64);ctx.fillStyle='#f6d46c';ctx.fillRect(item.x,item.y-64,24,5);}else{ctx.fillStyle='#bc8222';ctx.font='32px Arial';ctx.fillText('★',item.x-16,item.y);}}ctx.fillStyle='#ef733e';ctx.beginPath();if(glide){ctx.moveTo(110,player);ctx.lineTo(65,player-20);ctx.lineTo(75,player);ctx.lineTo(65,player+20);}else{ctx.moveTo(player-38,306);ctx.lineTo(player+38,306);ctx.lineTo(player+26,330);ctx.lineTo(player-26,330);}ctx.closePath();ctx.fill();if(paused){ctx.fillStyle='#14353b';ctx.font='bold 28px Arial';ctx.fillText('Paused',245,180);}gameFrame=requestAnimationFrame(frame);}gameFrame=requestAnimationFrame(frame);}
 choreLink.start();
 dialog.addEventListener('cancel' ,e=>{e.preventDefault();close()});render();
+academyAccount=await bootAcademy({
+ game:'numberquest',eventDriven:true,
+ identity:()=>{if(!state.academyLocalId){state.academyLocalId=crypto.randomUUID();save();}return state.academyLocalId;},
+ select:id=>{const i=book.profiles.findIndex(p=>p.academyLocalId===id);if(i<0)return false;book.active=i;state=book.profiles[i];save();render();return true;},
+ create:hero=>{if(book.profiles.length>=12)throw Error('This device has 12 heroes. Export a backup and free a profile before connecting.');const profile=initial(hero.name.slice(0,24));profile.academyLocalId=crypto.randomUUID();if(colours.includes(hero.colour))profile.colour=hero.colour;if(['star','diamond','bolt'].includes(hero.emblem))profile.emblem=hero.emblem;book.profiles.push(profile);book.active=book.profiles.length-1;state=profile;save();render();return profile.academyLocalId;},
+ snapshot:()=>({...state,records:state.records.slice(-300)}),
+ restore:remote=>{const id=state.academyLocalId,profile=valid({version:3,active:0,profiles:[remote]}).profiles[0];book.profiles[book.active]=profile;state=profile;state.academyLocalId=id;island=0;selected=0;save();close();render();},
+ milestones:()=>[...new Set(state.done)],
+ connected:()=>{close();render();}
+});
+
 

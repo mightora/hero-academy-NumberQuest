@@ -1,4 +1,4 @@
-const fs=require('fs'),vm=require('vm');const source=fs.readFileSync('app.js','utf8').replace(/^import .*;$/gm,'').replace(/render\(\);\s*$/,'');
+const fs=require('fs'),vm=require('vm');const source=fs.readFileSync('app.js','utf8').split('academyAccount=await bootAcademy(')[0].replace(/^import .*;$/gm,'').replace(/render\(\);\s*$/,'');
 const elements={};const el=()=>({innerHTML:'',textContent:'',dataset:{},style:{},classList:{toggle(){}},setAttribute(){},removeAttribute(){},append(){},querySelector(){return el()},querySelectorAll(){return []},addEventListener(){},focus(){},showModal(){},close(){}});const storage={};const context=vm.createContext({createChoreLink:()=>({status:()=>({connected:false}),start(){},sync:async()=>{},enqueue(){}}),console,Math,Set,Error,Number,String,Array,JSON,localStorage:{getItem:k=>storage[k]||null,setItem:(k,v)=>storage[k]=v},document:{querySelector:s=>elements[s]||(elements[s]=el()),querySelectorAll:()=>[],createElement:el,getElementById:()=>null,body:el(),documentElement:el()},window:{},cancelAnimationFrame(){},setTimeout(){},clearTimeout(){},hero:()=>'',robot:()=>'',landmark:()=>'',terrain:()=>'',icon:()=>''});vm.runInContext(source,context);
 vm.runInContext(`
 let count=0,missingCount=0,storyCount=0,triples=0;
@@ -10,3 +10,4 @@ for(island=0;island<4;island++){state.difficulty=0;for(selected=0;selected<60;se
 const profile=initial('Existing');profile.points=1234;profile.done=Array.from({length:32},(_,i)=>i);profile.records=[{level:31,op:'÷',correct:true,supported:false}];const converted=valid({version:2,active:0,profiles:[profile]});if(converted.profiles[0].points!==1234||converted.profiles[0].done.join(',')!==[...Array(4)].flatMap((_,m)=>[...Array(8)].map((_,i)=>m*60+i)).join(',')||converted.profiles[0].records[0].level!==187)throw Error('Migration lost history');valid(JSON.parse(JSON.stringify(converted)));
 console.log(count+' generated questions valid; '+missingCount+' missing-number, '+storyCount+' story and '+triples+' three-term questions checked. All 240 map stops render; v2 progress migrates without changing points.');
 `,context);
+
